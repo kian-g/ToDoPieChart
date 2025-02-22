@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pie Chart To-Do List</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+    /* Container for main content that will be pushed by stats menu */
+    #mainContent {
+      display: flex;
+      height: 100vh;
+      transition: margin-right 0.3s ease;
+    }
+    /* Left panel styles */
+    .left-panel {
+      width: 33%;
+      background: #f4f7f9;
+      border-right: 1px solid #ddd;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    h1 { text-align: center; color: #444; }
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    form label { display: block; margin: 10px 0 5px; font-weight: bold; }
+    form input[type="text"],
+    form input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    form button {
+      width: 100%;
+      padding: 10px;
+      background: #4e79a7;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    #controls { margin-bottom: 10px; padding: 0 5px; }
+    #controls label { font-weight: normal; }
+    #taskList { margin-top: 20px; }
+    .task {
+      background: #fff;
+      border-left: 6px solid;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .task:hover { background: #f0f0f0; }
+    .task.complete { color: #888; text-decoration: line-through; }
+    .task.selected { background: #e6f2fa; border-left-width: 8px; }
+    .task-info { margin-bottom: 10px; }
+    .task-info strong { display: block; font-size: 1.1em; }
+    .progress-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    /* Styled slider */
+    .progress-control input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: #ddd;
+      border-radius: 5px;
+      outline: none;
+    }
+    .progress-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #4e79a7;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .progress-control input[type="range"]::-webkit-slider-thumb:hover {
+      background: #36719d;
+    }
+    .progress-control input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #4e79a7;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .progress-control input[type="range"]::-moz-range-thumb:hover {
+      background: #36719d;
+    }
+    .progress-control button {
+      padding: 5px 10px;
+      border: none;
+      background: #4e79a7;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    /* Delete button for tasks using Font Awesome trash icon */
+    .delete-task {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: #e15759;
+    }
+    /* Category Settings Section */
+    #categorySettings {
+      margin-top: 30px;
+      padding-top: 10px;
+      border-top: 1px solid #ccc;
+    }
+    #categorySettings h2 { margin-bottom: 10px; font-size: 1.1em; }
+    .category-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .category-item label { flex: 1; }
+    /* Delete button for category using Font Awesome trash icon */
+    .delete-category {
+      background: transparent;
+      border: none;
+      color: #e15759;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    /* Right panel styles */
+    .right-panel {
+      width: 67%;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas { max-width: 90%; max-height: 90%; }
+    /* Hamburger menu button */
+    .hamburger {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      width: 35px;
+      height: 30px;
+      cursor: pointer;
+      z-index: 30;
+    }
+    .hamburger div {
+      width: 100%;
+      height: 5px;
+      background: #4e79a7;
+      margin: 4px 0;
+      transition: all 0.3s ease;
+    }
+    /* Stats Menu (side panel) */
+    #statsMenu {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100%;
+      background: #fff;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+      padding: 20px;
+      overflow-y: auto;
+      transition: right 0.3s ease;
+      z-index: 20;
+    }
+    #statsMenu.open { right: 0; }
+    #statsMenu h2 { margin-top: 0; }
+    #statsMenu .stat-item { margin-bottom: 10px; }
+    #statsMenu button {
+      width: 100%;
+      padding: 10px;
+      background: #4e79a7;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    /* File load input (hidden) */
+    #fileInput { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Hamburger Menu Button -->
+  <div class="hamburger" id="hamburger">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+  
+  <!-- Stats Menu (side panel) -->
+  <div id="statsMenu">
+    <h2>Your Stats</h2>
+    <div id="statsContent"><!-- Stats generated here --></div>
+    <button id="saveState">Save State to File</button>
+    <button id="loadState">Load State from File</button>
+    <input type="file" id="fileInput" accept=".txt">
+  </div>
+  
+  <!-- Main Content Container -->
+  <div id="mainContent">
+    <!-- Left Panel: Task Form, Controls, Task List, and Category Settings -->
+    <div class="left-panel">
+      <h1>To-Do List</h1>
+      <form id="taskForm">
+        <label for="parentGroup">Parent Group:</label>
+        <!-- Datalist provides suggestions from existing categories -->
+        <input type="text" id="parentGroup" list="groupList" placeholder="Enter category" required>
+        <datalist id="groupList"></datalist>
+        
+        <label for="subTask">Sub Task:</label>
+        <input type="text" id="subTask" required placeholder="e.g., Homework, Wash Dishes">
+        
+        <label for="timeRequired">Time (minutes):</label>
+        <input type="number" id="timeRequired" required placeholder="e.g., 30">
+        
+        <button type="submit">Add Task</button>
+      </form>
+      
+      <!-- Checkbox to Show/Hide Completed Tasks -->
+      <div id="controls">
+        <input type="checkbox" id="showCompleted" checked>
+        <label for="showCompleted">Show Completed</label>
+      </div>
+      
+      <div id="taskList"><!-- Task items here --></div>
+      
+      <!-- Category Settings Section -->
+      <div id="categorySettings">
+        <h2>Customize Category Colors</h2>
+        <!-- Category items generated here -->
+      </div>
+    </div>
+    
+    <!-- Right Panel: Pie Chart -->
+    <div class="right-panel">
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+  
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // DOM Elements
+    const taskForm = document.getElementById('taskForm');
+    const taskListDiv = document.getElementById('taskList');
+    const showCompletedCheckbox = document.getElementById('showCompleted');
+    const groupListDatalist = document.getElementById('groupList');
+    const categorySettingsDiv = document.getElementById('categorySettings');
+    const statsMenu = document.getElementById('statsMenu');
+    const statsContent = document.getElementById('statsContent');
+    const hamburger = document.getElementById('hamburger');
+    const closeStatsBtn = document.getElementById('closeStats');
+    const saveStateBtn = document.getElementById('saveState');
+    const loadStateBtn = document.getElementById('loadState');
+    const fileInput = document.getElementById('fileInput');
+    const mainContent = document.getElementById('mainContent');
+    
+    let tasks = [];
+    const groupColors = {};
+    
+    // --- Utility Functions ---
+    function randomColor() {
+      const color = Math.floor(Math.random() * 16777215).toString(16);
+      return '#' + ("000000" + color).slice(-6);
+    }
+    
+    function shadeColor(color, percent) {
+      let f = parseInt(color.slice(1), 16),
+          t = percent < 0 ? 0 : 255,
+          p = Math.abs(percent),
+          R = f >> 16,
+          G = f >> 8 & 0x00FF,
+          B = f & 0x0000FF;
+      return "#" + (0x1000000 + (Math.round((t - R) * p) + R) * 0x10000 +
+                    (Math.round((t - G) * p) + G) * 0x100 +
+                    (Math.round((t - B) * p) + B))
+                    .toString(16).slice(1);
+    }
+    
+    // --- Chart Initialization ---
+    let chart;
+    function initChart() {
+      const ctx = document.getElementById('pieChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Completed',
+            data: [],
+            backgroundColor: [],
+            offset: []
+          },{
+            label: 'Remaining',
+            data: [],
+            backgroundColor: [],
+            offset: []
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: context => {
+                  const label = context.dataset.label || '';
+                  return label + ': ' + context.parsed;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // --- Update Chart ---
+    function updateChart() {
+      const completedData = [];
+      const remainingData = [];
+      const labels = [];
+      const completedColors = [];
+      const remainingColors = [];
+      const completedOffsets = [];
+      const remainingOffsets = [];
+      const showCompleted = showCompletedCheckbox.checked;
+      
+      tasks.forEach(task => {
+        if (task.progress === 100 && !showCompleted) return;
+        labels.push(task.parentGroup + " - " + task.subTask);
+        const comp = task.timeRequired * (task.progress / 100);
+        const remain = task.timeRequired - comp;
+        completedData.push(comp);
+        remainingData.push(remain);
+        const base = groupColors[task.parentGroup] || '#999999';
+        completedColors.push(shadeColor(base, -0.3));
+        remainingColors.push(shadeColor(base, 0.3));
+        const offsetVal = task.highlight ? 40 : 0;
+        completedOffsets.push(offsetVal);
+        remainingOffsets.push(offsetVal);
+      });
+      
+      chart.data.labels = labels;
+      chart.data.datasets[0].data = completedData;
+      chart.data.datasets[0].backgroundColor = completedColors;
+      chart.data.datasets[0].offset = completedOffsets;
+      chart.data.datasets[1].data = remainingData;
+      chart.data.datasets[1].backgroundColor = remainingColors;
+      chart.data.datasets[1].offset = remainingOffsets;
+      chart.update();
+    }
+    
+    // --- Update Task List Visibility ---
+    function updateTaskVisibility() {
+      const showCompleted = showCompletedCheckbox.checked;
+      document.querySelectorAll('.task').forEach(taskDiv => {
+        if (taskDiv.classList.contains('complete')) {
+          taskDiv.style.display = showCompleted ? 'flex' : 'none';
+        }
+      });
+    }
+    
+    // --- Update Category Settings ---
+    function updateCategorySettings() {
+      categorySettingsDiv.innerHTML = '<h2>Customize Category Colors</h2>';
+      Object.keys(groupColors).forEach(category => {
+        const div = document.createElement('div');
+        div.className = 'category-item';
+        const label = document.createElement('label');
+        label.textContent = category;
+        const colorInput = document.createElement('input');
+        colorInput.type = 'color';
+        colorInput.value = groupColors[category];
+        colorInput.addEventListener('change', function() {
+          groupColors[category] = colorInput.value;
+          document.querySelectorAll('.task').forEach(taskDiv => {
+            if (taskDiv.querySelector('.task-info').textContent.indexOf(category) !== -1) {
+              taskDiv.style.borderLeftColor = groupColors[category];
+            }
+          });
+          updateChart();
+          autoSave();
+        });
+        // Delete button for category using trash icon from Font Awesome.
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-category';
+        delBtn.innerHTML = '<i class="fa fa-trash"></i>';
+        delBtn.addEventListener('click', function() {
+          if (confirm(`Are you sure you want to delete the category "${category}"? This will delete all tasks in this category.`)) {
+            // Remove tasks in this category.
+            tasks = tasks.filter(task => task.parentGroup !== category);
+            // Remove category from groupColors.
+            delete groupColors[category];
+            // Update datalist.
+            const options = groupListDatalist.querySelectorAll('option');
+            options.forEach(option => {
+              if (option.value === category) option.remove();
+            });
+            // Re-render tasks.
+            taskListDiv.innerHTML = "";
+            tasks.forEach(task => renderTask(task));
+            updateCategorySettings();
+            updateChart();
+            autoSave();
+          }
+        });
+        div.appendChild(label);
+        div.appendChild(colorInput);
+        div.appendChild(delBtn);
+        categorySettingsDiv.appendChild(div);
+      });
+    }
+    
+    // --- Render a Single Task ---
+    function renderTask(task) {
+      const taskDiv = document.createElement('div');
+      taskDiv.className = 'task';
+      taskDiv.style.borderLeftColor = groupColors[task.parentGroup] || '#999';
+      
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'task-info';
+      infoDiv.innerHTML = `<strong>${task.parentGroup} - ${task.subTask}</strong>
+                           <span>Time: ${task.timeRequired} minutes</span>`;
+      taskDiv.appendChild(infoDiv);
+      
+      const controlDiv = document.createElement('div');
+      controlDiv.className = 'progress-control';
+      
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = 0;
+      slider.max = 100;
+      slider.value = task.progress;
+      slider.addEventListener('input', function() {
+        task.progress = parseInt(slider.value);
+        percentLabel.textContent = slider.value + '%';
+        if (task.progress === 100) {
+          taskDiv.classList.add('complete');
+        } else {
+          taskDiv.classList.remove('complete');
+        }
+        updateChart();
+        updateTaskVisibility();
+        autoSave();
+      });
+      controlDiv.appendChild(slider);
+      
+      const percentLabel = document.createElement('span');
+      percentLabel.textContent = task.progress + '%';
+      controlDiv.appendChild(percentLabel);
+      
+      const completeBtn = document.createElement('button');
+      completeBtn.textContent = "Complete";
+      completeBtn.addEventListener('click', function() {
+        slider.value = 100;
+        slider.dispatchEvent(new Event('input'));
+      });
+      controlDiv.appendChild(completeBtn);
+      
+      // Delete Task Button with trash icon from Font Awesome.
+      const delTaskBtn = document.createElement('button');
+      delTaskBtn.className = "delete-task";
+      delTaskBtn.innerHTML = '<i class="fa fa-trash"></i>';
+      delTaskBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (confirm("Are you sure you want to delete this task?")) {
+          tasks = tasks.filter(t => t !== task);
+          taskDiv.remove();
+          updateChart();
+          autoSave();
+        }
+      });
+      controlDiv.appendChild(delTaskBtn);
+      
+      taskDiv.appendChild(controlDiv);
+      
+      // Toggle highlight on click.
+      taskDiv.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON') return;
+        if (task.highlight) {
+          task.highlight = false;
+          taskDiv.classList.remove('selected');
+        } else {
+          tasks.forEach(t => t.highlight = false);
+          document.querySelectorAll('.task').forEach(div => div.classList.remove('selected'));
+          task.highlight = true;
+          taskDiv.classList.add('selected');
+        }
+        updateChart();
+        autoSave();
+      });
+      
+      taskListDiv.appendChild(taskDiv);
+    }
+    
+    // --- Auto-save State to localStorage ---
+    function autoSave() {
+      const state = { tasks, groupColors };
+      localStorage.setItem('todoState', JSON.stringify(state));
+      updateStats();
+    }
+    
+    // --- Load State from localStorage ---
+    function loadLocalState() {
+      const stateStr = localStorage.getItem('todoState');
+      if (!stateStr) return;
+      const state = JSON.parse(stateStr);
+      tasks = state.tasks || [];
+      Object.keys(state.groupColors || {}).forEach(cat => {
+        groupColors[cat] = state.groupColors[cat];
+      });
+      taskListDiv.innerHTML = "";
+      tasks.forEach(task => renderTask(task));
+      updateCategorySettings();
+      updateChart();
+      updateStats();
+    }
+    
+    // --- Save State to File ---
+    function saveStateToFile() {
+      const state = { tasks, groupColors };
+      const dataStr = JSON.stringify(state, null, 2);
+      const blob = new Blob([dataStr], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "todoState.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    // --- Load State from File ---
+    function loadStateFromFile(fileContent) {
+      try {
+        const state = JSON.parse(fileContent);
+        tasks = state.tasks || [];
+        Object.keys(state.groupColors || {}).forEach(cat => {
+          groupColors[cat] = state.groupColors[cat];
+        });
+        taskListDiv.innerHTML = "";
+        tasks.forEach(task => renderTask(task));
+        updateCategorySettings();
+        updateChart();
+        updateStats();
+        autoSave();
+      } catch (e) {
+        alert("Error loading state: " + e.message);
+      }
+    }
+    
+    // --- Update Stats in Stats Menu ---
+    function updateStats() {
+      let totalTime = 0;
+      let completedCount = 0;
+      const categoryStats = {};
+      tasks.forEach(task => {
+        totalTime += task.timeRequired;
+        if (task.progress === 100) completedCount++;
+        if (!categoryStats[task.parentGroup]) {
+          categoryStats[task.parentGroup] = { count: 0, time: 0 };
+        }
+        categoryStats[task.parentGroup].count++;
+        categoryStats[task.parentGroup].time += task.timeRequired;
+      });
+      let statsHtml = `<div class="stat-item"><strong>Total Tasks:</strong> ${tasks.length}</div>`;
+      statsHtml += `<div class="stat-item"><strong>Completed Tasks:</strong> ${completedCount}</div>`;
+      statsHtml += `<div class="stat-item"><strong>Total Time:</strong> ${totalTime} minutes</div>`;
+      statsHtml += `<hr>`;
+      statsHtml += `<div class="stat-item"><strong>By Category:</strong></div>`;
+      Object.keys(categoryStats).forEach(cat => {
+        statsHtml += `<div class="stat-item">${cat}: ${categoryStats[cat].count} tasks, ${categoryStats[cat].time} minutes</div>`;
+      });
+      statsContent.innerHTML = statsHtml;
+    }
+    
+    // --- Event Listeners ---
+    taskForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      let parentGroup = document.getElementById('parentGroup').value.trim();
+      const subTask = document.getElementById('subTask').value.trim();
+      const timeRequired = parseFloat(document.getElementById('timeRequired').value);
+      // If the parent group field is empty, assign "Uncategorized"
+      if (!parentGroup) {
+        parentGroup = "Uncategorized";
+      }
+      if (!groupColors[parentGroup]) {
+        groupColors[parentGroup] = randomColor();
+        const option = document.createElement('option');
+        option.value = parentGroup;
+        groupListDatalist.appendChild(option);
+        updateCategorySettings();
+      }
+      const newTask = { parentGroup, subTask, timeRequired, progress: 0, highlight: false };
+      tasks.push(newTask);
+      renderTask(newTask);
+      updateChart();
+      autoSave();
+      taskForm.reset();
+    });
+    
+    showCompletedCheckbox.addEventListener('change', function() {
+      updateTaskVisibility();
+      updateChart();
+      autoSave();
+    });
+    
+    // Hamburger toggles stats menu and pushes content.
+    hamburger.addEventListener('click', () => {
+      statsMenu.classList.toggle('open');
+      if (statsMenu.classList.contains('open')) {
+        mainContent.style.marginRight = "300px";
+      } else {
+        mainContent.style.marginRight = "0";
+      }
+      updateStats();
+    });
+    
+    // Close stats menu button.
+    closeStatsBtn.addEventListener('click', () => {
+      statsMenu.classList.remove('open');
+      mainContent.style.marginRight = "0";
+    });
+    
+    // Save state to file button.
+    saveStateBtn.addEventListener('click', () => {
+      saveStateToFile();
+    });
+    
+    // Load state from file button.
+    loadStateBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        loadStateFromFile(e.target.result);
+      };
+      reader.readAsText(file);
+    });
+    
+    // Auto-save on page unload.
+    window.addEventListener('beforeunload', autoSave);
+    
+    // Initialize on load.
+    initChart();
+    loadLocalState();
+  </script>
+</body>
+</html>
