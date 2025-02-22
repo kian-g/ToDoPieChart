@@ -172,6 +172,7 @@ form button {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 canvas { max-width: 90%; max-height: 90%; }
@@ -211,11 +212,8 @@ canvas { max-width: 90%; max-height: 90%; }
 }
 
 #statsMenu.open { right: 0; }
-
 #statsMenu h2 { margin-top: 0; }
-
 #statsMenu .stat-item { margin-bottom: 10px; }
-
 #statsMenu button {
   width: 100%;
   padding: 10px;
