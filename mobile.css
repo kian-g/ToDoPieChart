@@ -3,6 +3,10 @@
     body {
         overflow-y: auto;
     }
+    html, body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
     /* Allow the entire page to scroll instead of fixing height */
     #mainContent {
       display: flex;
