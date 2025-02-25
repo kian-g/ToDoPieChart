@@ -1,29 +1,38 @@
-* { box-sizing: border-box; }
+/* Basic Reset & Typography */
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  background: #fafafa;
 }
 
-/* Container for main content that will be pushed by stats menu */
+/* Responsive viewport container */
 #mainContent {
   display: flex;
   height: 100vh;
   transition: margin-right 0.3s ease;
 }
 
-/* Left panel styles */
+/* Left Panel */
 .left-panel {
-  width: 33%;
+  width: 35%;
   background: #f4f7f9;
   border-right: 1px solid #ddd;
   padding: 20px;
   overflow-y: auto;
 }
 
-h1 { text-align: center; color: #444; }
+/* Headings */
+h1, h2 {
+  text-align: center;
+  color: #444;
+}
 
+/* Form Styles */
 form {
   background: #fff;
   padding: 15px;
@@ -31,9 +40,11 @@ form {
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   margin-bottom: 20px;
 }
-
-form label { display: block; margin: 10px 0 5px; font-weight: bold; }
-
+form label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
 form input[type="text"],
 form input[type="number"] {
   width: 100%;
@@ -41,7 +52,6 @@ form input[type="number"] {
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-
 form button {
   width: 100%;
   padding: 10px;
@@ -53,10 +63,19 @@ form button {
   margin-top: 15px;
 }
 
-#controls { margin-bottom: 10px; padding: 0 5px; }
-#controls label { font-weight: normal; }
-#taskList { margin-top: 20px; }
+/* Controls */
+#controls {
+  margin-bottom: 10px;
+  padding: 0 5px;
+}
+#controls label {
+  font-weight: normal;
+}
 
+/* Task List */
+#taskList {
+  margin-top: 20px;
+}
 .task {
   background: #fff;
   border-left: 6px solid;
@@ -69,22 +88,32 @@ form button {
   cursor: pointer;
   transition: background 0.2s;
 }
+.task:hover {
+  background: #f0f0f0;
+}
+.task.complete {
+  color: #888;
+  text-decoration: line-through;
+}
+.task.selected {
+  background: #e6f2fa;
+  border-left-width: 8px;
+}
+.task-info {
+  margin-bottom: 10px;
+}
+.task-info strong {
+  display: block;
+  font-size: 1.1em;
+}
 
-.task:hover { background: #f0f0f0; }
-.task.complete { color: #888; text-decoration: line-through; }
-.task.selected { background: #e6f2fa; border-left-width: 8px; }
-
-.task-info { margin-bottom: 10px; }
-.task-info strong { display: block; font-size: 1.1em; }
-
+/* Progress Controls */
 .progress-control {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
 }
-
-/* Styled slider */
 .progress-control input[type="range"] {
   -webkit-appearance: none;
   width: 100%;
@@ -93,7 +122,6 @@ form button {
   border-radius: 5px;
   outline: none;
 }
-
 .progress-control input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 18px;
@@ -103,11 +131,9 @@ form button {
   cursor: pointer;
   transition: background 0.3s ease;
 }
-
 .progress-control input[type="range"]::-webkit-slider-thumb:hover {
   background: #36719d;
 }
-
 .progress-control input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
@@ -116,11 +142,9 @@ form button {
   cursor: pointer;
   transition: background 0.3s ease;
 }
-
 .progress-control input[type="range"]::-moz-range-thumb:hover {
   background: #36719d;
 }
-
 .progress-control button {
   padding: 5px 10px;
   border: none;
@@ -130,8 +154,9 @@ form button {
   cursor: pointer;
 }
 
-/* Delete button for tasks using Font Awesome trash icon */
-.delete-task {
+/* Delete Buttons */
+.delete-task,
+.delete-category {
   background: transparent;
   border: none;
   font-size: 18px;
@@ -145,39 +170,34 @@ form button {
   padding-top: 10px;
   border-top: 1px solid #ccc;
 }
-
-#categorySettings h2 { margin-bottom: 10px; font-size: 1.1em; }
-
+#categorySettings h2 {
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
 .category-item {
   display: flex;
   align-items: center;
   margin-bottom: 8px;
 }
-
-.category-item label { flex: 1; }
-
-/* Delete button for category using Font Awesome trash icon */
-.delete-category {
-  background: transparent;
-  border: none;
-  color: #e15759;
-  font-size: 18px;
-  cursor: pointer;
+.category-item label {
+  flex: 1;
 }
 
-/* Right panel styles */
+/* Right Panel (Pie Chart) */
 .right-panel {
-  width: 67%;
+  width: 65%;
   padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
 }
+canvas {
+  max-width: 90%;
+  max-height: 90%;
+}
 
-canvas { max-width: 90%; max-height: 90%; }
-
-/* Hamburger menu button */
+/* Hamburger Menu Button */
 .hamburger {
   position: fixed;
   top: 10px;
@@ -187,7 +207,6 @@ canvas { max-width: 90%; max-height: 90%; }
   cursor: pointer;
   z-index: 30;
 }
-
 .hamburger div {
   width: 100%;
   height: 5px;
@@ -196,7 +215,7 @@ canvas { max-width: 90%; max-height: 90%; }
   transition: all 0.3s ease;
 }
 
-/* Stats Menu (side panel) */
+/* Stats Menu (Side Panel) */
 #statsMenu {
   position: fixed;
   top: 0;
@@ -210,10 +229,15 @@ canvas { max-width: 90%; max-height: 90%; }
   transition: right 0.3s ease;
   z-index: 20;
 }
-
-#statsMenu.open { right: 0; }
-#statsMenu h2 { margin-top: 0; }
-#statsMenu .stat-item { margin-bottom: 10px; }
+#statsMenu.open {
+  right: 0;
+}
+#statsMenu h2 {
+  margin-top: 0;
+}
+#statsMenu .stat-item {
+  margin-bottom: 10px;
+}
 #statsMenu button {
   width: 100%;
   padding: 10px;
@@ -225,5 +249,25 @@ canvas { max-width: 90%; max-height: 90%; }
   margin-top: 10px;
 }
 
-/* File load input (hidden) */
-#fileInput { display: none; }
+/* File Input (Hidden) */
+#fileInput {
+  display: none;
+}
+
+/* Mobile Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  #mainContent {
+    flex-direction: column;
+    height: auto;
+  }
+  .left-panel, .right-panel {
+    width: 100%;
+    padding: 10px;
+  }
+  .hamburger {
+    top: 5px;
+    right: 5px;
+    width: 30px;
+    height: 25px;
+  }
+}
