@@ -31,13 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const showCompletedCheckbox = document.getElementById('showCompleted');
   const groupListDatalist = document.getElementById('groupList');
   const categorySettingsDiv = document.getElementById('categorySettings');
-  const statsMenu = document.getElementById('statsMenu');
-  const statsContent = document.getElementById('statsContent');
-  const hamburger = document.getElementById('hamburger');
-  const closeStatsBtn = document.getElementById('closeStats');
-  const saveStateBtn = document.getElementById('saveState');
-  const loadStateBtn = document.getElementById('loadState');
-  const fileInput = document.getElementById('fileInput');
   const mainContent = document.getElementById('mainContent');
   
   let tasks = [];
@@ -84,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           centerText: {
@@ -332,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // --- Update Stats in Stats Menu ---
+  // --- Update Stats (if needed) ---
   function updateStats() {
     let totalTime = 0;
     let completedCount = 0;
@@ -346,15 +340,8 @@ document.addEventListener('DOMContentLoaded', function() {
       categoryStats[task.parentGroup].count++;
       categoryStats[task.parentGroup].time += task.timeRequired;
     });
-    let statsHtml = `<div class="stat-item"><strong>Total Tasks:</strong> ${tasks.length}</div>`;
-    statsHtml += `<div class="stat-item"><strong>Completed Tasks:</strong> ${completedCount}</div>`;
-    statsHtml += `<div class="stat-item"><strong>Total Time:</strong> ${totalTime} minutes</div>`;
-    statsHtml += `<hr>`;
-    statsHtml += `<div class="stat-item"><strong>By Category:</strong></div>`;
-    Object.keys(categoryStats).forEach(cat => {
-      statsHtml += `<div class="stat-item">${cat}: ${categoryStats[cat].count} tasks, ${categoryStats[cat].time} minutes</div>`;
-    });
-    statsContent.innerHTML = statsHtml;
+    // For this version we won't display stats separately.
+    // You can log them to console or use them as needed.
   }
   
   // --- Event Listeners ---
@@ -388,39 +375,7 @@ document.addEventListener('DOMContentLoaded', function() {
     autoSave();
   });
   
-  hamburger.addEventListener('click', () => {
-    statsMenu.classList.toggle('open');
-    if (statsMenu.classList.contains('open')) {
-      mainContent.style.marginRight = "300px";
-    } else {
-      mainContent.style.marginRight = "0";
-    }
-    updateStats();
-  });
-  
-  closeStatsBtn.addEventListener('click', () => {
-    statsMenu.classList.remove('open');
-    mainContent.style.marginRight = "0";
-  });
-  
-  saveStateBtn.addEventListener('click', () => {
-    saveStateToFile();
-  });
-  
-  loadStateBtn.addEventListener('click', () => {
-    fileInput.click();
-  });
-  
-  fileInput.addEventListener('change', function() {
-    const file = fileInput.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      loadStateFromFile(e.target.result);
-    };
-    reader.readAsText(file);
-  });
-  
+  // Auto-save state on unload
   window.addEventListener('beforeunload', autoSave);
   
   initChart();

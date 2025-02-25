@@ -2,31 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Set viewport for mobile responsiveness -->
+  <!-- Ensure mobile responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Responsive Pie Chart To-Do List</title>
+  <title>Pie Chart To-Do List</title>
   <link rel="stylesheet" href="styles.css">
+  <!-- Load mobile-specific CSS on small screens -->
+  <link rel="stylesheet" media="(max-width: 768px)" href="mobile.css">
   <!-- Font Awesome for trash icon -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-  <!-- Hamburger Menu Button -->
-  <div class="hamburger" id="hamburger">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-  
-  <!-- Stats Menu (side panel) -->
-  <div id="statsMenu">
-    <button id="closeStats" class="close-btn">Close</button>
-    <h2>Your Stats</h2>
-    <div id="statsContent"><!-- Stats generated here --></div>
-    <button id="saveState">Save State to File</button>
-    <button id="loadState">Load State from File</button>
-    <input type="file" id="fileInput" accept=".txt">
-  </div>
-  
   <!-- Main Content Container -->
   <div id="mainContent">
     <!-- Left Panel: Task Form, Controls, Task List, and Category Settings -->
@@ -53,7 +38,7 @@
         <label for="showCompleted">Show Completed</label>
       </div>
       
-      <div id="taskList"><!-- Task items here --></div>
+      <div id="taskList"><!-- Task items will be added here --></div>
       
       <!-- Category Settings Section -->
       <div id="categorySettings">
