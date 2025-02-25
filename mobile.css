@@ -1,8 +1,11 @@
 /* Mobile Styles for devices with width 768px or less */
 @media screen and (max-width: 768px) {
-    /* Stack main content vertically */
+    /* Allow the entire page to scroll instead of fixing height */
     #mainContent {
+      display: flex;
       flex-direction: column;
+      height: auto;
+      margin-right: 0;
     }
     
     .left-panel, .right-panel {
@@ -19,6 +22,26 @@
       order: 2;
     }
     
+    /* Adjust hamburger button size and positioning */
+    .hamburger {
+      top: 5px;
+      right: 5px;
+      width: 30px;
+      height: 25px;
+    }
+    .hamburger div {
+      height: 4px;
+      margin: 3px 0;
+    }
+    
+    /* Remove fixed height from canvas so it scales */
+    .right-panel canvas {
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      max-height: none;
+    }
+    
     /* Increase font sizes for readability */
     h1 {
       font-size: 1.5em;
@@ -31,14 +54,6 @@
     button {
       font-size: 1em;
       padding: 12px;
-    }
-    
-    /* Expand the pie chart to fill available space */
-    .right-panel canvas {
-      max-width: 100%;
-      max-height: 100%;
-      width: 100%;
-      height: auto;
     }
   }
   
